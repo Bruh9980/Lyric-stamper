@@ -27,7 +27,9 @@ h2 {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 20px;
+  width: min(100%, 760px);
+  margin-inline: auto;
+  padding: 12px 14px;
 }
 
 .waveform {
@@ -193,7 +195,61 @@ textarea {
 body { font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; }
 
 /* waveform container fallback */
-#waveform { background: linear-gradient(90deg, #eef2ff, #f8fafc); }
+#waveform {
+  width: 100%;
+  height: 56px !important;
+  min-height: 0;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(90deg, #eef2ff, #f8fafc);
+}
+
+#waveform > wave {
+  height: 100% !important;
+  max-height: 100%;
+  overflow: hidden auto;
+}
+
+.audio-player-details {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  min-width: 0;
+}
+
+.album-art {
+  width: 64px;
+  height: 64px;
+  flex: 0 0 64px;
+  border-radius: 0.75rem;
+  object-fit: cover;
+  background: #f1f5f9;
+  box-shadow: 0 3px 10px rgba(15, 23, 42, .12);
+}
+
+.audio-player-summary,
+.audio-control-row,
+#audio-info {
+  min-width: 0;
+}
+
+.audio-control-row {
+  width: 100%;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+#audio-file {
+  min-width: 0;
+  max-width: 100%;
+  flex: 1 1 13rem;
+}
+
+#progress {
+  min-width: 0;
+  flex: 1 1 9rem;
+}
 
 /* list line style */
 #lines-list li { display:flex; align-items:center; gap:12px; padding:8px 10px; }
@@ -376,6 +432,7 @@ body {
 @media (max-width: 767px) {
   body {
     padding-bottom: 86px;
+    overflow-x: hidden;
   }
 
   main {
@@ -388,14 +445,70 @@ body {
   }
 
   #waveform {
-    height: 90px !important;
+    height: 64px !important;
+  }
+
+  .audio-player {
+    width: 100%;
+    padding: 10px;
+    align-items: stretch;
+    overflow: hidden;
   }
 
   #audio-info {
     width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    min-width: 0;
+    overflow-wrap: anywhere;
+    white-space: normal;
+  }
+
+  .audio-player-summary {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: stretch;
+    gap: 8px;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .audio-player-details {
+    width: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .album-art {
+    align-self: center;
+  }
+
+  .audio-control-row {
+    display: grid !important;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 8px;
+    align-items: center;
+    justify-content: initial;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  #audio-file {
+    grid-column: 1 / -1;
+    min-width: 0;
+    max-width: 100%;
+    flex-basis: auto;
+    width: 100%;
+  }
+
+  #play-pause {
+    flex: 0 0 auto;
+  }
+
+  #progress {
+    grid-column: 2;
+    flex-basis: auto;
+    width: auto;
+    margin-left: 0;
+    max-width: 100%;
   }
 
   #lines-list {
@@ -451,6 +564,84 @@ body {
   /* md:hidden equivalent */
   #mobile-controls {
     display: flex;
+  }
+}
+
+/* Final mobile overrides: keep native file controls inside the viewport. */
+@media (max-width: 767px) {
+  .audio-player,
+  .audio-player-details,
+  .audio-player-summary,
+  .audio-control-row {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .audio-player {
+    display: block !important;
+    overflow: hidden !important;
+  }
+
+  .audio-player-details {
+    display: block !important;
+    margin-top: 8px;
+  }
+
+  .album-art {
+    display: block;
+    width: 56px;
+    height: 56px;
+    margin: 0 auto 8px;
+  }
+
+  .album-art.hidden {
+    display: none !important;
+  }
+
+  .audio-player-summary {
+    display: block !important;
+  }
+
+  #audio-info {
+    display: block;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    margin-bottom: 8px;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+    white-space: normal;
+  }
+
+  .audio-control-row {
+    display: grid !important;
+    grid-template-columns: auto minmax(0, 1fr) !important;
+    gap: 8px !important;
+    align-items: center;
+  }
+
+  #audio-file {
+    display: block;
+    grid-column: 1 / -1;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    overflow: hidden;
+  }
+
+  #play-pause {
+    grid-column: 1;
+    width: auto;
+    max-width: 100%;
+  }
+
+  #progress {
+    grid-column: 2;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    margin: 0 !important;
   }
 }
 
