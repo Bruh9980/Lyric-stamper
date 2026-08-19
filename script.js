@@ -1,5 +1,4 @@
 // script.js
-let ws;
 
 document.addEventListener('DOMContentLoaded', () => {
   // DOM elements (declare early to avoid ReferenceError)
@@ -13,7 +12,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const progress = document.getElementById('progress');
   const info = document.getElementById('audio-info');
   const fileInput = document.getElementById('audio-file');
-  const albumArt = document.getElementById('album-art');
   const downloadBtn = document.getElementById('download-lrc');
   const previewWarning = document.getElementById('preview-warning');
   const downloadWarning = document.getElementById('download-warning');
@@ -43,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Wavesurfer init
-  ws = WaveSurfer.create({
+  let ws = WaveSurfer.create({
     container: '#waveform',
     waveColor: '#bfdbfe',
     progressColor: '#3b82f6',
@@ -132,93 +130,9 @@ document.addEventListener('DOMContentLoaded', () => {
     ws.seekTo(val / (ws.getDuration() || 1));
   });
 
-  function readText(bytes, start, end) {
-    return new TextDecoder('latin1').decode(bytes.slice(start, end));
-  }
-
-  function findAlbumArt(file) {
-    return file.arrayBuffer().then((buffer) => {
-      const bytes = new Uint8Array(buffer);
-      if (bytes.length < 10 || readText(bytes, 0, 3) !== 'ID3') return null;
-
-      const version = bytes[3];
-      const flags = bytes[5];
-      const tagSize = ((bytes[6] & 0x7f) << 21) |
-        ((bytes[7] & 0x7f) << 14) |
-        ((bytes[8] & 0x7f) << 7) |
-        (bytes[9] & 0x7f);
-      let offset = 10 + ((flags & 0x40) ? 4 : 0);
-      const tagEnd = Math.min(bytes.length, 10 + tagSize);
-
-      while (offset < tagEnd - 10) {
-        const frameId = readText(bytes, offset, offset + (version === 2 ? 3 : 4));
-        const frameSize = version === 2
-          ? (bytes[offset + 3] << 16) | (bytes[offset + 4] << 8) | bytes[offset + 5]
-          : (version === 4
-            ? ((bytes[offset + 4] & 0x7f) << 21) | ((bytes[offset + 5] & 0x7f) << 14) |
-              ((bytes[offset + 6] & 0x7f) << 7) | (bytes[offset + 7] & 0x7f)
-            : (bytes[offset + 4] << 24) | (bytes[offset + 5] << 16) | (bytes[offset + 6] << 8) | bytes[offset + 7]);
-        const headerSize = version === 2 ? 6 : 10;
-        if (!frameId.trim() || !frameSize) break;
-
-        const frameStart = offset + headerSize;
-        const frameEnd = Math.min(frameStart + frameSize, tagEnd);
-        if (frameId === 'APIC' || frameId === 'PIC') {
-          const encoding = bytes[frameStart];
-          let cursor = frameStart + 1;
-          let mime = 'image/jpeg';
-          if (version === 2) {
-            mime = `image/${readText(bytes, cursor, cursor + 3).toLowerCase()}`;
-            cursor += 3;
-          } else {
-            const mimeEnd = bytes.indexOf(0, cursor);
-            if (mimeEnd < 0) return null;
-            mime = readText(bytes, cursor, mimeEnd) || mime;
-            cursor = mimeEnd + 2;
-          }
-          const terminatorSize = encoding === 1 || encoding === 2 ? 2 : 1;
-          let imageStart = cursor;
-          for (let index = cursor; index < frameEnd - terminatorSize; index += 1) {
-            const isTerminator = bytes[index] === 0 &&
-              (terminatorSize === 1 || bytes[index + 1] === 0);
-            if (isTerminator) {
-              imageStart = index + terminatorSize;
-              break;
-            }
-          }
-          if (imageStart < frameEnd) {
-            return new Blob([bytes.slice(imageStart, frameEnd)], { type: mime });
-          }
-        }
-        offset = frameEnd;
-      }
-      return null;
-    });
-  }
-
-  function updateAlbumArt(file) {
-    if (!albumArt) return;
-    albumArt.onerror = () => {
-      albumArt.classList.add('hidden');
-      albumArt.removeAttribute('src');
-    };
-    albumArt.classList.add('hidden');
-    albumArt.removeAttribute('src');
-    if (!file) return;
-
-    findAlbumArt(file).then((cover) => {
-      if (!cover) return;
-      albumArt.src = URL.createObjectURL(cover);
-      albumArt.classList.remove('hidden');
-    }).catch(() => {
-      albumArt.classList.add('hidden');
-    });
-  }
-
   if (fileInput) fileInput.addEventListener('change', (e) => {
     const f = e.target.files[0];
     if (!f) return;
-    updateAlbumArt(f);
     const url = URL.createObjectURL(f);
     ws.load(url);
   });
