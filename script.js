@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const info = document.getElementById('audio-info');
   const fileInput = document.getElementById('audio-file');
   const albumArt = document.getElementById('album-art');
+  const albumArtStorageKey = 'timed-lyrics-editor-album-art';
   const downloadBtn = document.getElementById('download-lrc');
   const previewWarning = document.getElementById('preview-warning');
   const downloadWarning = document.getElementById('download-warning');
@@ -234,13 +235,43 @@ document.addEventListener('DOMContentLoaded', () => {
     albumArt.removeAttribute('src');
     if (!file) return;
 
+    try {
+      localStorage.removeItem(albumArtStorageKey);
+    } catch {
+      // localStorage can be unavailable in private or restricted browsing modes.
+    }
+
     findAlbumArt(file).then((cover) => {
       if (!cover) return;
-      albumArt.src = URL.createObjectURL(cover);
-      albumArt.classList.remove('hidden');
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        const dataUrl = String(reader.result || '');
+        if (!dataUrl) return;
+
+        albumArt.src = dataUrl;
+        albumArt.classList.remove('hidden');
+
+        try {
+          localStorage.setItem(albumArtStorageKey, dataUrl);
+        } catch {
+          // Large covers may exceed localStorage quota; display still works.
+        }
+      };
+      reader.readAsDataURL(cover);
     }).catch(() => {
       albumArt.classList.add('hidden');
     });
+  }
+
+  try {
+    const savedAlbumArt = localStorage.getItem(albumArtStorageKey);
+    if (savedAlbumArt && albumArt) {
+      albumArt.src = savedAlbumArt;
+      albumArt.classList.remove('hidden');
+    }
+  } catch {
+    // localStorage can be unavailable in private or restricted browsing modes.
   }
 
   if (fileInput) fileInput.addEventListener('change', (e) => {
