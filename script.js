@@ -25,6 +25,12 @@ document.addEventListener('DOMContentLoaded', () => {
   let lines = []; // { text: string, time: number|null }
   let currentIndex = 0;
 
+  try {
+    localStorage.removeItem(albumArtStorageKey);
+  } catch {
+    // localStorage can be unavailable in private or restricted browsing modes.
+  }
+
   // Tabs
   tabButtons.forEach(btn => {
     btn.addEventListener('click', () => {
@@ -57,6 +63,46 @@ document.addEventListener('DOMContentLoaded', () => {
     barWidth: 2,
     responsive: true
   });
+
+  const waveform = document.getElementById('waveform');
+  let isWaveformDragging = false;
+
+  function seekWaveformAt(clientX) {
+    if (!waveform || !ws) return;
+    const duration = ws.getDuration() || 0;
+    if (!duration) return;
+
+    const bounds = waveform.getBoundingClientRect();
+    const position = Math.max(0, Math.min(1, (clientX - bounds.left) / bounds.width));
+    ws.seekTo(position);
+  }
+
+  if (waveform) {
+    waveform.addEventListener('pointerdown', (event) => {
+      isWaveformDragging = true;
+      waveform.setPointerCapture?.(event.pointerId);
+      seekWaveformAt(event.clientX);
+      event.preventDefault();
+    });
+
+    waveform.addEventListener('pointermove', (event) => {
+      if (!isWaveformDragging) return;
+      seekWaveformAt(event.clientX);
+      event.preventDefault();
+    });
+
+    const stopWaveformDragging = (event) => {
+      if (!isWaveformDragging) return;
+      isWaveformDragging = false;
+      waveform.releasePointerCapture?.(event.pointerId);
+    };
+
+    waveform.addEventListener('pointerup', stopWaveformDragging);
+    waveform.addEventListener('pointercancel', stopWaveformDragging);
+    waveform.addEventListener('lostpointercapture', () => {
+      isWaveformDragging = false;
+    });
+  }
 
   function formatTime(s) {
     if (!isFinite(s)) return '0:00.00';
@@ -280,16 +326,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }).catch(() => {
       albumArt.classList.add('hidden');
     });
-  }
-
-  try {
-    const savedAlbumArt = localStorage.getItem(albumArtStorageKey);
-    if (savedAlbumArt && albumArt) {
-      albumArt.src = savedAlbumArt;
-      albumArt.classList.remove('hidden');
-    }
-  } catch {
-    // localStorage can be unavailable in private or restricted browsing modes.
   }
 
   if (fileInput) fileInput.addEventListener('change', (e) => {

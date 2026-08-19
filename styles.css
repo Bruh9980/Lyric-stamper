@@ -201,6 +201,9 @@ body { font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvet
   min-height: 0;
   position: relative;
   overflow: hidden;
+  cursor: ew-resize;
+  user-select: none;
+  touch-action: none;
   background: linear-gradient(90deg, #eef2ff, #f8fafc);
 }
 
@@ -695,6 +698,35 @@ body {
 
 #audio-file::file-selector-button:hover {
   background: linear-gradient(180deg, #dbeafe, #bfdbfe);
+}
+
+/* Refined custom picker button */
+.file-input-wrapper {
+  min-width: 0;
+  padding: 4px;
+  border: 1px solid #dbe3ef;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #ffffff, #f1f5f9);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .9), 0 3px 10px rgba(15, 23, 42, .07);
+}
+
+.file-input-button {
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: linear-gradient(180deg, #2563eb, #1d4ed8);
+  box-shadow: 0 3px 8px rgba(37, 99, 235, .2);
+  font-size: .875rem;
+}
+
+.file-input-filename {
+  min-width: 0;
+  color: #475569;
+  font-size: .8rem;
+}
+
+.file-input-wrapper:focus-within {
+  border-color: #93c5fd;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, .16), inset 0 1px 0 rgba(255, 255, 255, .9);
 }
 
 @media (max-width: 767px) {
