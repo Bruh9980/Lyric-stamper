@@ -225,6 +225,24 @@ document.addEventListener('DOMContentLoaded', () => {
     return findAlbumArtFromId3(file);
   }
 
+  // Clear album art (remove src + localStorage) — call when starting a new session or when file input cleared
+  function clearAlbumArt() {
+    if (!albumArt) return;
+    try {
+      localStorage.removeItem(albumArtStorageKey);
+    } catch (err) {
+      // ignore localStorage errors
+    }
+    albumArt.classList.add('hidden');
+    // revoke object URL if any
+    try {
+      if (albumArt.src && albumArt.src.startsWith('blob:')) {
+        URL.revokeObjectURL(albumArt.src);
+      }
+    } catch (e) { /* ignore */ }
+    albumArt.removeAttribute('src');
+  }
+
   function updateAlbumArt(file) {
     if (!albumArt) return;
     albumArt.onerror = () => {
@@ -276,7 +294,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (fileInput) fileInput.addEventListener('change', (e) => {
     const f = e.target.files[0];
-    if (!f) return;
+    if (!f) {
+      // file input cleared — remove album art from UI + storage
+      clearAlbumArt();
+      return;
+    }
     updateAlbumArt(f);
 
     // Use createObjectURL for efficient audio loading, but revoke it after Wavesurfer has decoded/loaded
@@ -515,6 +537,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const startSyncBtn = document.getElementById('start-sync');
   if (startSyncBtn) {
     startSyncBtn.addEventListener('click', () => {
+      // If user starts a new sync without selecting audio, clear previous cover
+      if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+        clearAlbumArt();
+      }
       loadLyricsFromTextarea();
       const syncBtn = document.querySelector('[data-target="syncer-tab"]');
       if (syncBtn) syncBtn.click();
