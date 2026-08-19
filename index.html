@@ -35,7 +35,9 @@
           <div id="audio-info" class="text-sm text-gray-600">No audio loaded — 0:00.00 / 0:00.00</div>
 
           <div class="audio-control-row flex items-center gap-2">
-            <input id="audio-file" type="file" accept="audio/*" class="text-sm" />
+            <!-- Ensure the audio file input is present and accessible. Added name and label for clarity. -->
+            <label for="audio-file" class="sr-only">Load audio file</label>
+            <input id="audio-file" name="audio-file" type="file" accept="audio/*" class="text-sm" />
             <button id="play-pause" class="btn-primary disabled:opacity-60" disabled>Play</button>
             <input id="progress" type="range" class="ml-2 w-48" value="0" min="0" max="100" />
           </div>
