@@ -1,5 +1,119 @@
 // script.js
 let ws;
+let editorLanguage = 'en';
+
+const editorTranslations = {
+  en: {
+    title: 'Timed Lyrics Editor',
+    subtitle: 'This tool is new. Feedback is welcome!',
+    languageLabel: 'Language',
+    chooseAudio: 'Choose audio',
+    play: 'Play',
+    pause: 'Pause',
+    lyrics: 'Lyrics',
+    syncer: 'Syncer',
+    preview: 'Preview',
+    metadata: 'Metadata',
+    download: 'Download',
+    help: 'Help',
+    pasteRaw: 'Paste raw lyrics below',
+    webSearch: 'Web Search',
+    startSync: 'Start Sync',
+    lyricsPlaceholder: 'Paste your lyrics here...',
+    syncerKeybinds: 'Syncer keybinds:',
+    syncerKeys: 'R = Stamp • T = Insert line • Y = Insert empty timing • K/Space = Play/Pause • ←/→ = Seek 5 seconds • ↑/↓ = Navigate • Delete = Clear timing',
+    tools: 'Tools',
+    desktopShortcuts: 'Use keyboard shortcuts on desktop.',
+    shiftTiming: 'Shift timing of every lyric',
+    shiftPlaceholder: 'seconds (e.g. 1.0 or -0.5)',
+    seconds: 'seconds',
+    previewKeybinds: 'Preview keybinds:',
+    previewKeys: 'K/Space = Play/Pause • ← = Seek back 5 seconds • → = Seek forward 5 seconds',
+    downloadWarning: 'Not all lines have timestamps.',
+    downloadLrc: 'Download .lrc',
+    aboutCreator: 'About the Creator',
+    creatorDescription: 'Web Developer focused on modern, fast, responsive, and easy-to-use interfaces.',
+    skillOne: 'HTML, CSS, JavaScript, and UI/UX',
+    skillTwo: 'React/Vue and 2D/3D game development',
+    skillThree: '3D, basic animation, Git/GitHub, Linux, and Shell',
+    portfolioContact: 'Portfolio & Contact',
+    projectsLabel: 'Projects:',
+    emailLabel: 'Email:',
+    whatsappLabel: 'WhatsApp:',
+    locationLabel: 'Location:',
+    feedbackTitle: 'Anonymous Feedback',
+    feedbackLocal: 'Saved on this device',
+    feedbackDescription: 'Share a comment about this editor. No name or profile is required.',
+    feedbackPlaceholder: 'Write your feedback...',
+    sendFeedback: 'Send feedback',
+    feedbackListTitle: 'Comments',
+    clearFeedback: 'Clear local comments',
+    noFeedback: 'No comments yet.',
+    feedbackEmpty: 'Please write a comment first.',
+    feedbackBlocked: 'Your comment contains blocked language. Please revise it.',
+    feedbackSaved: 'Feedback saved.',
+    feedbackDeleted: 'Local comments cleared.',
+    noAudio: 'No audio loaded — 0:00.00 / 0:00.00',
+    noFile: 'No file chosen'
+  },
+  id: {
+    title: 'Timed Lyrics Editor',
+    subtitle: 'Alat ini masih baru. Kritik dan saran sangat diterima!',
+    languageLabel: 'Bahasa',
+    chooseAudio: 'Pilih audio',
+    play: 'Putar',
+    pause: 'Jeda',
+    lyrics: 'Lirik',
+    syncer: 'Syncer',
+    preview: 'Pratinjau',
+    metadata: 'Metadata',
+    download: 'Unduh',
+    help: 'Bantuan',
+    pasteRaw: 'Tempel lirik mentah di bawah',
+    webSearch: 'Cari di Web',
+    startSync: 'Mulai Sinkronisasi',
+    lyricsPlaceholder: 'Tempel lirik kamu di sini...',
+    syncerKeybinds: 'Tombol cepat Syncer:',
+    syncerKeys: 'R = Tandai waktu • T = Sisipkan baris • Y = Sisipkan waktu kosong • K/Space = Putar/Jeda • ←/→ = Geser 5 detik • ↑/↓ = Navigasi • Delete = Hapus waktu',
+    tools: 'Alat',
+    desktopShortcuts: 'Gunakan tombol cepat pada desktop.',
+    shiftTiming: 'Geser waktu semua lirik',
+    shiftPlaceholder: 'detik (contoh 1.0 atau -0.5)',
+    seconds: 'detik',
+    previewKeybinds: 'Tombol cepat Pratinjau:',
+    previewKeys: 'K/Space = Putar/Jeda • ← = Mundur 5 detik • → = Maju 5 detik',
+    downloadWarning: 'Belum semua baris memiliki timestamp.',
+    downloadLrc: 'Unduh .lrc',
+    aboutCreator: 'Tentang Pembuat',
+    creatorDescription: 'Web Developer yang berfokus pada antarmuka modern, cepat, responsif, dan mudah digunakan.',
+    skillOne: 'HTML, CSS, JavaScript, dan UI/UX',
+    skillTwo: 'React/Vue dan pengembangan game 2D/3D',
+    skillThree: '3D, animasi dasar, Git/GitHub, Linux, dan Shell',
+    portfolioContact: 'Portofolio & Kontak',
+    projectsLabel: 'Proyek:',
+    emailLabel: 'Email:',
+    whatsappLabel: 'WhatsApp:',
+    locationLabel: 'Lokasi:',
+    feedbackTitle: 'Feedback Anonim',
+    feedbackLocal: 'Tersimpan di perangkat ini',
+    feedbackDescription: 'Bagikan komentar tentang editor ini. Tidak perlu nama atau profil.',
+    feedbackPlaceholder: 'Tulis feedback kamu...',
+    sendFeedback: 'Kirim feedback',
+    feedbackListTitle: 'Komentar',
+    clearFeedback: 'Hapus komentar lokal',
+    noFeedback: 'Belum ada komentar.',
+    feedbackEmpty: 'Tulis komentar terlebih dahulu.',
+    feedbackBlocked: 'Komentar mengandung bahasa yang diblokir. Silakan ubah kembali.',
+    feedbackSaved: 'Feedback tersimpan.',
+    feedbackDeleted: 'Komentar lokal dihapus.',
+    noAudio: 'Belum ada audio — 0:00.00 / 0:00.00',
+    noFile: 'Belum ada file'
+  }
+};
+
+function localizedText(key) {
+  return editorTranslations[editorLanguage][key] || editorTranslations.en[key] || key;
+}
 
 document.addEventListener('DOMContentLoaded', () => {
   // DOM elements (declare early to avoid ReferenceError)
@@ -18,6 +132,166 @@ document.addEventListener('DOMContentLoaded', () => {
   const downloadBtn = document.getElementById('download-lrc');
   const previewWarning = document.getElementById('preview-warning');
   const downloadWarning = document.getElementById('download-warning');
+  const languageSelect = document.getElementById('language-select');
+  const feedbackForm = document.getElementById('feedback-form');
+  const feedbackInput = document.getElementById('feedback-input');
+  const feedbackList = document.getElementById('feedback-list');
+  const feedbackStatus = document.getElementById('feedback-status');
+  const clearFeedbackButton = document.getElementById('clear-feedback');
+  const feedbackStorageKey = 'timed-lyrics-editor-feedback';
+  const blockedWords = [
+    'fuck', 'fucking', 'shit', 'bitch', 'asshole', 'bastard', 'dick', 'pussy',
+    'kontol', 'memek', 'ngentot', 'bajingan', 'bangsat', 'brengsek', 'anjing', 'tolol'
+  ];
+
+  function readFeedback() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(feedbackStorageKey) || '[]');
+      return Array.isArray(saved) ? saved : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function writeFeedback(items) {
+    try {
+      localStorage.setItem(feedbackStorageKey, JSON.stringify(items));
+    } catch {
+      return false;
+    }
+    return true;
+  }
+
+  function normalizeFeedbackText(value) {
+    return value.toLowerCase().normalize('NFKC').replace(/[\u200B-\u200D\uFEFF]/g, '');
+  }
+
+  function containsBlockedWord(value) {
+    const normalized = normalizeFeedbackText(value).replace(/[^a-z0-9\u00C0-\u024F\u1E00-\u1EFF]+/gi, ' ');
+    return blockedWords.some((word) => new RegExp(`(^|\\s)${word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?=\\s|$)`, 'i').test(normalized));
+  }
+
+  function setFeedbackStatus(key, isError = false) {
+    if (!feedbackStatus) return;
+    feedbackStatus.textContent = localizedText(key);
+    feedbackStatus.className = `text-sm ${isError ? 'feedback-error' : 'feedback-success'}`;
+  }
+
+  function renderFeedback() {
+    if (!feedbackList) return;
+    const items = readFeedback();
+    feedbackList.innerHTML = '';
+    if (!items.length) {
+      const empty = document.createElement('p');
+      empty.className = 'feedback-empty text-sm text-gray-500';
+      empty.textContent = localizedText('noFeedback');
+      feedbackList.appendChild(empty);
+      return;
+    }
+
+    items.forEach((item, index) => {
+      const article = document.createElement('article');
+      article.className = 'feedback-item';
+
+      const meta = document.createElement('div');
+      meta.className = 'feedback-item-meta';
+      const date = new Date(item.createdAt);
+      meta.textContent = Number.isNaN(date.getTime())
+        ? 'Anonymous'
+        : `${editorLanguage === 'id' ? 'Anonim' : 'Anonymous'} · ${date.toLocaleString(editorLanguage === 'id' ? 'id-ID' : 'en-US')}`;
+
+      const text = document.createElement('p');
+      text.className = 'feedback-item-text';
+      text.textContent = item.text;
+
+      const remove = document.createElement('button');
+      remove.type = 'button';
+      remove.className = 'feedback-remove';
+      remove.textContent = '×';
+      remove.setAttribute('aria-label', editorLanguage === 'id' ? 'Hapus komentar' : 'Delete comment');
+      remove.addEventListener('click', () => {
+        const nextItems = readFeedback();
+        nextItems.splice(index, 1);
+        writeFeedback(nextItems);
+        renderFeedback();
+      });
+
+      article.append(meta, text, remove);
+      feedbackList.appendChild(article);
+    });
+  }
+
+  function applyLanguage(language) {
+    editorLanguage = language === 'id' ? 'id' : 'en';
+    document.documentElement.lang = editorLanguage;
+    document.querySelectorAll('[data-i18n]').forEach((element) => {
+      element.textContent = localizedText(element.dataset.i18n);
+    });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach((element) => {
+      element.placeholder = localizedText(element.dataset.i18nPlaceholder);
+    });
+    const filename = document.querySelector('.file-input-filename');
+    if (filename && !fileInput?.files?.length) filename.textContent = localizedText('noFile');
+    const metadataPlaceholders = editorLanguage === 'id'
+      ? {
+        'input-ti': 'Judul', 'input-ar': 'Artis', 'input-al': 'Album', 'input-au': 'Penulis',
+        'input-length': 'Durasi (contoh 03:45)', 'input-offset': 'Offset (contoh 0)',
+        'input-by': 'Penulis LRC', 'input-tool': 'Alat', 'input-re': 'Alat (re)', 'input-ve': 'Versi'
+      }
+      : {
+        'input-ti': 'Title', 'input-ar': 'Artist', 'input-al': 'Album', 'input-au': 'Author',
+        'input-length': 'Length (e.g. 03:45)', 'input-offset': 'Offset (e.g. 0)',
+        'input-by': 'LRC Author/By', 'input-tool': 'Tool', 'input-re': 'Tool (re)', 'input-ve': 'Version'
+      };
+    Object.entries(metadataPlaceholders).forEach(([id, placeholder]) => {
+      const input = document.getElementById(id);
+      if (input) input.placeholder = placeholder;
+    });
+    const mobilePlayButton = document.getElementById('mobile-play');
+    if (mobilePlayButton) mobilePlayButton.textContent = localizedText('play');
+    if (languageSelect) languageSelect.value = editorLanguage;
+    renderFeedback();
+    try {
+      localStorage.setItem('timed-lyrics-editor-language', editorLanguage);
+    } catch {
+      // Ignore restricted storage environments.
+    }
+  }
+
+  languageSelect?.addEventListener('change', () => applyLanguage(languageSelect.value));
+  let savedLanguage = 'en';
+  try {
+    savedLanguage = localStorage.getItem('timed-lyrics-editor-language') || 'en';
+  } catch {
+    // Ignore restricted storage environments.
+  }
+  applyLanguage(savedLanguage);
+
+  feedbackForm?.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const text = feedbackInput?.value.trim() || '';
+    if (!text) {
+      setFeedbackStatus('feedbackEmpty', true);
+      return;
+    }
+    if (containsBlockedWord(text)) {
+      setFeedbackStatus('feedbackBlocked', true);
+      return;
+    }
+
+    const items = readFeedback();
+    items.unshift({ text, createdAt: new Date().toISOString() });
+    if (!writeFeedback(items)) return;
+    feedbackInput.value = '';
+    setFeedbackStatus('feedbackSaved');
+    renderFeedback();
+  });
+
+  clearFeedbackButton?.addEventListener('click', () => {
+    writeFeedback([]);
+    setFeedbackStatus('feedbackDeleted');
+    renderFeedback();
+  });
 
   // state
   let currentTab = null;
@@ -50,7 +324,9 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   if (typeof WaveSurfer === 'undefined') {
-    if (info) info.textContent = 'Audio player unavailable. Reload the page to retry.';
+    if (info) info.textContent = editorLanguage === 'id'
+      ? 'Pemutar audio tidak tersedia. Muat ulang halaman untuk mencoba lagi.'
+      : 'Audio player unavailable. Reload the page to retry.';
     return;
   }
 
@@ -176,7 +452,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Controls
   if (playBtn) playBtn.addEventListener('click', () => {
     ws.playPause();
-    playBtn.textContent = ws.isPlaying() ? 'Pause' : 'Play';
+    playBtn.textContent = localizedText(ws.isPlaying() ? 'pause' : 'play');
   });
 
   if (progress) progress.addEventListener('input', (e) => {
@@ -335,6 +611,8 @@ document.addEventListener('DOMContentLoaded', () => {
       clearAlbumArt();
       return;
     }
+    const filenameLabel = document.querySelector('.file-input-filename');
+    if (filenameLabel) filenameLabel.textContent = f.name;
     updateAlbumArt(f);
 
     // Use createObjectURL for efficient audio loading, but revoke it after Wavesurfer has decoded/loaded
@@ -399,19 +677,47 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Keyboard shortcuts only when in syncer tab
   document.addEventListener('keydown', (e) => {
-    if (currentTab !== 'syncer-tab') return;
+    if (currentTab !== 'syncer-tab' && currentTab !== 'preview-tab') return;
     const active = document.activeElement;
     if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable)) return;
     const key = e.key.toLowerCase();
-    if (key === 'r') { stampCurrent(); e.preventDefault(); }
-    else if (key === 'k' || key === ' ') { ws.playPause(); if (playBtn) playBtn.textContent = ws.isPlaying() ? 'Pause' : 'Play'; e.preventDefault(); }
-    else if (key === 'arrowdown') { selectLine(Math.min(currentIndex+1, lines.length-1)); e.preventDefault(); }
-    else if (key === 'arrowup') { selectLine(Math.max(0, currentIndex-1)); e.preventDefault(); }
-    else if (key === 'arrowleft') { const ct = Math.max(0, ws.getCurrentTime()-5); ws.seekTo(ct / (ws.getDuration() || 1)); e.preventDefault(); }
-    else if (key === 'arrowright') { const ct2 = Math.min(ws.getDuration() || 0, ws.getCurrentTime()+5); ws.seekTo(ct2 / (ws.getDuration() || 1)); e.preventDefault(); }
-    else if (key === 't') { lines.splice(currentIndex+1,0,{text:'',time:null}); rebuildLines(); selectLine(currentIndex+1); e.preventDefault(); }
-    else if (key === 'y') { lines.splice(currentIndex+1,0,{text:'',time:0}); rebuildLines(); selectLine(currentIndex+1); e.preventDefault(); }
-    else if (key === 'delete') { if (lines[currentIndex]) { lines[currentIndex].time = null; rebuildLines(); } }
+    if (key === 'k' || key === ' ') {
+      ws.playPause();
+      if (playBtn) playBtn.textContent = localizedText(ws.isPlaying() ? 'pause' : 'play');
+      e.preventDefault();
+    } else if (key === 'arrowleft') {
+      const currentTime = Math.max(0, ws.getCurrentTime() - 5);
+      ws.seekTo(currentTime / (ws.getDuration() || 1));
+      e.preventDefault();
+    } else if (key === 'arrowright') {
+      const nextTime = Math.min(ws.getDuration() || 0, ws.getCurrentTime() + 5);
+      ws.seekTo(nextTime / (ws.getDuration() || 1));
+      e.preventDefault();
+    } else if (currentTab === 'syncer-tab' && key === 'r') {
+      stampCurrent();
+      e.preventDefault();
+    } else if (currentTab === 'syncer-tab' && key === 'arrowdown') {
+      selectLine(Math.min(currentIndex + 1, lines.length - 1));
+      e.preventDefault();
+    } else if (currentTab === 'syncer-tab' && key === 'arrowup') {
+      selectLine(Math.max(0, currentIndex - 1));
+      e.preventDefault();
+    } else if (currentTab === 'syncer-tab' && key === 't') {
+      lines.splice(currentIndex + 1, 0, { text: '', time: null });
+      rebuildLines();
+      selectLine(currentIndex + 1);
+      e.preventDefault();
+    } else if (currentTab === 'syncer-tab' && key === 'y') {
+      lines.splice(currentIndex + 1, 0, { text: '', time: 0 });
+      rebuildLines();
+      selectLine(currentIndex + 1);
+      e.preventDefault();
+    } else if (currentTab === 'syncer-tab' && key === 'delete') {
+      if (lines[currentIndex]) {
+        lines[currentIndex].time = null;
+        rebuildLines();
+      }
+    }
   });
 
   // mobile buttons (safe attach)
@@ -462,7 +768,6 @@ document.addEventListener('DOMContentLoaded', () => {
     elems.forEach((el, i) => {
       if (i === activeIdx) {
         el.classList.add('active-preview-line');
-        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
       } else {
         el.classList.remove('active-preview-line');
       }
@@ -675,7 +980,7 @@ function updateMobileControls() {
 
 function updateMobilePlayButton() {
   if (!mobilePlay || !ws) return;
-  mobilePlay.textContent = ws.isPlaying() ? 'Pause' : 'Play';
+  mobilePlay.textContent = localizedText(ws.isPlaying() ? 'pause' : 'play');
 }
 
 function seekAudio(seconds) {
