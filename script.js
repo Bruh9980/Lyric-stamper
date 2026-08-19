@@ -278,8 +278,26 @@ document.addEventListener('DOMContentLoaded', () => {
     const f = e.target.files[0];
     if (!f) return;
     updateAlbumArt(f);
+
+    // Use createObjectURL for efficient audio loading, but revoke it after Wavesurfer has decoded/loaded
     const url = URL.createObjectURL(f);
     ws.load(url);
+
+    // Revoke the object URL once Wavesurfer signals ready to avoid leaking memory.
+    const revokeOnce = () => {
+      try { URL.revokeObjectURL(url); } catch (err) { /* ignore */ }
+    };
+
+    if (typeof ws.once === 'function') {
+      ws.once('ready', revokeOnce);
+    } else if (typeof ws.on === 'function') {
+      // add a one-time listener fallback
+      const handler = () => { revokeOnce(); if (typeof ws.off === 'function') ws.off('ready', handler); if (typeof ws.un === 'function') ws.un('ready', handler); };
+      ws.on('ready', handler);
+    } else {
+      // last resort: attempt to revoke after a delay (not ideal but safe)
+      setTimeout(revokeOnce, 5000);
+    }
   });
 
   // Syncer UI
