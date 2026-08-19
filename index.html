@@ -14,6 +14,95 @@
     }
   </script>
   <script src="https://cdn.jsdelivr.net/npm/jsmediatags@3.9.7/dist/jsmediatags.min.js"></script>
+
+  <!-- File input styling inserted inline to avoid extra stylesheet edits -->
+  <style>
+    /* Styled file input (wrapper + textured button) */
+    .file-input-wrapper {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: .75rem;
+      background: linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,0.15));
+      padding: .35rem .5rem;
+      border-radius: 12px;
+      border: 1px solid rgba(99,102,241,0.06);
+      box-shadow: 0 6px 18px rgba(16,24,40,0.06), inset 0 1px 0 rgba(255,255,255,0.6);
+      backdrop-filter: blur(4px);
+      cursor: pointer;
+      user-select: none;
+      transition: transform .08s ease, box-shadow .12s ease;
+    }
+
+    /* subtle diagonal texture */
+    .file-input-wrapper::before{
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 12px;
+      background-image:
+        repeating-linear-gradient(135deg, rgba(255,255,255,0.03) 0 2px, rgba(0,0,0,0.01) 2px 4px);
+      pointer-events: none;
+      mix-blend-mode: overlay;
+    }
+
+    /* hide native input but keep it accessible */
+    .file-input-visually-hidden {
+      position: absolute !important;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* the visible button */
+    .file-input-button {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      padding: .45rem .7rem;
+      background: linear-gradient(180deg,#3b82f6,#2563eb);
+      color: white;
+      font-weight: 600;
+      border-radius: 10px;
+      box-shadow: 0 6px 12px rgba(37,99,235,0.18);
+      transition: transform .12s ease, box-shadow .12s ease;
+      white-space: nowrap;
+    }
+
+    /* small icon inside button */
+    .file-input-button .fi-icon { opacity: .95; transform: translateY(-1px); }
+
+    /* hover / active / focus */
+    .file-input-wrapper:hover .file-input-button,
+    .file-input-button:focus,
+    .file-input-button:active {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 22px rgba(37,99,235,0.22);
+    }
+
+    /* filename label */
+    .file-input-filename {
+      color: #0f172a;
+      font-size: .9rem;
+      max-width: 26ch;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      opacity: .95;
+    }
+
+    /* small screens: wrap */
+    @media (max-width:640px){
+      .file-input-wrapper { flex-wrap: wrap; gap:.5rem; }
+      .file-input-filename { max-width: 100%; }
+    }
+
+  </style>
 </head>
 <body class="bg-gray-50 text-gray-800 antialiased">
 
@@ -35,9 +124,16 @@
           <div id="audio-info" class="text-sm text-gray-600">No audio loaded — 0:00.00 / 0:00.00</div>
 
           <div class="audio-control-row flex items-center gap-2">
-            <!-- Ensure the audio file input is present and accessible. Added name and label for clarity. -->
-            <label for="audio-file" class="sr-only">Load audio file</label>
-            <input id="audio-file" name="audio-file" type="file" accept="audio/*" class="text-sm" />
+            <!-- Styled file input wrapper -->
+            <label class="file-input-wrapper" for="audio-file" aria-hidden="false">
+              <input id="audio-file" name="audio-file" type="file" accept="audio/*" class="file-input-visually-hidden" />
+              <span class="file-input-button" role="button" tabindex="0" aria-hidden="true">
+                <svg class="fi-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 3v12" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 12h14" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Choose audio
+              </span>
+              <span class="file-input-filename">No file chosen</span>
+            </label>
+
             <button id="play-pause" class="btn-primary disabled:opacity-60" disabled>Play</button>
             <input id="progress" type="range" class="ml-2 w-48" value="0" min="0" max="100" />
           </div>
@@ -223,6 +319,8 @@
     </button>
   </div>
 
+  <!-- small inline helper for file-input UI -->
+  <script src="file-input-ui.js?v=1"></script>
   <script src="script.js?v=20260819-5"></script>
 </body>
 </html>
