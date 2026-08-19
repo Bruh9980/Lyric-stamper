@@ -340,13 +340,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // mobile buttons (safe attach)
   const mbStamp = document.getElementById('mobile-stamp');
-  const mbPrev = document.getElementById('mobile-prev');
-  const mbNext = document.getElementById('mobile-next');
-  const mbPlay = document.getElementById('mobile-play');
   if (mbStamp) mbStamp.addEventListener('click', stampCurrent);
-  if (mbPrev) mbPrev.addEventListener('click', () => selectLine(Math.max(0,currentIndex-1)));
-  if (mbNext) mbNext.addEventListener('click', () => selectLine(Math.min(lines.length-1,currentIndex+1)));
-  if (mbPlay) mbPlay.addEventListener('click', () => { ws.playPause(); if (playBtn) playBtn.textContent = ws.isPlaying() ? 'Pause' : 'Play'; });
 
   // Preview utilities
   function toLrcTime(t) {
