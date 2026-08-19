@@ -6,7 +6,7 @@
   <title>Timed Lyrics Editor</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="./styles.css?v=20260819-3">
+  <link rel="stylesheet" href="./styles.css?v=20260819-4">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/wavesurfer.js/6.3.0/wavesurfer.min.js"></script>
   <script>
     if (!window.WaveSurfer) {
@@ -115,7 +115,7 @@
 
   <main class="max-w-5xl mx-auto p-4 space-y-4">
     <section class="audio-player card p-4">
-      <div id="waveform" class="h-28 rounded-md overflow-hidden"></div>
+      <div id="waveform" class="h-28 rounded-md overflow-hidden" style="touch-action:none"></div>
 
       <div class="audio-player-details mt-3">
         <img id="album-art" class="album-art hidden" alt="Album cover" />
@@ -135,7 +135,7 @@
             </label>
 
             <button id="play-pause" class="btn-primary disabled:opacity-60" disabled>Play</button>
-            <input id="progress" type="range" class="ml-2 w-48" value="0" min="0" max="100" />
+            <!-- Removed linear progress bar: waveform is used for seeking -->
           </div>
         </div>
       </div>
@@ -321,6 +321,6 @@
 
   <!-- small inline helper for file-input UI -->
   <script src="file-input-ui.js?v=1"></script>
-  <script src="script.js?v=20260819-5"></script>
+  <script src="script.js?v=20260819-6"></script>
 </body>
 </html>
